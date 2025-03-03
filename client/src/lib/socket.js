@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
 
 export const makeSocketConnection = async () => {
-    return io('http://localhost:3000');
+    return io('https://temp-room-chat-app.onrender.com/');
 }
