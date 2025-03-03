@@ -11,6 +11,7 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [usersList, setUsersList] = useState(0);
   const [joiningRoom, setJoiningRoom] = useState(false);
+  const [creatingRoom, setCreatingRoom] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -62,9 +63,11 @@ function App() {
   }, [messages]);
 
   const handleCreateNewRoom = () => {
+    setCreatingRoom(true);
     const roomCode = nanoid(8);
     socket.emit("createRoom", { roomId: roomCode }, () => {
       setRoomCode(roomCode);
+      setCreatingRoom(false);
       toast.success("Room created successfully");
     });
   }
@@ -85,7 +88,7 @@ function App() {
     e.preventDefault();
     socket.emit("joinRoom", { name: formData.name, roomId: formData.roomCode }, ({ status, message }) => {
       setJoiningRoom(false);
-      if(!status) {
+      if (!status) {
         toast.error(message);
       } else {
         toast.success("Room joined successfully");
@@ -132,8 +135,11 @@ function App() {
               <div>
                 <button
                   onClick={handleCreateNewRoom}
-                  disabled={joiningRoom}
-                  className={`w-full text-black py-2 font-bold text-xl rounded-lg ${joiningRoom ? "bg-gray-300" : "bg-[#fafafa]"}`}>Create New Room</button>
+                  disabled={creatingRoom}
+                  className={`w-full lg:text-xl text-sm mt-2 ${creatingRoom ? "bg-gray-300" : "bg-[#fafafa]"} text-black py-2 font-bold rounded-lg flex gap-2 items-center justify-center`}>
+                  Create New Room
+                  {creatingRoom && (<i className="ri-loader-2-line text-xl animate-spin"></i>)}
+                </button>
               </div>
 
               <div>
@@ -160,7 +166,7 @@ function App() {
 
                     <button
                       disabled={joiningRoom}
-                      className={`md:w-[40%] w-full ${joiningRoom ? "bg-gray-300" : "bg-[#fafafa]"} text-black py-2 font-bold rounded-lg flex gap-2 items-center justify-center`} type='submit'>
+                      className={`md:w-[40%] lg:text-xl text-sm mt-2 w-full ${joiningRoom ? "bg-gray-300" : "bg-[#fafafa]"} text-black py-2 font-bold rounded-lg flex gap-2 items-center justify-center`} type='submit'>
                       Join Room
                       {joiningRoom && (<i className="ri-loader-2-line text-xl animate-spin"></i>)}
                     </button>
@@ -171,14 +177,14 @@ function App() {
 
               {roomCode && (
                 <div className='flex flex-col items-center py-4 gap-3 rounded-md text-gray-300 bg-[#272627]'>
-                  <p className='text-sm '>
+                  <p className='sm:text-sm text-xs'>
                     Share this code with your friend
                   </p>
 
                   <div className='flex gap-6 items-center'>
-                    <span className='text-2xl font-bold'>{roomCode}</span>
+                    <span className='lg:text-2xl text-xl font-bold'>{roomCode}</span>
                     <button onClick={copyToClipboard}>
-                      <i className="ri-file-copy-line text-2xl"></i>
+                      <i className="ri-file-copy-line lg:text-2xl text-xl"></i>
                     </button>
                   </div>
                 </div>
@@ -186,23 +192,27 @@ function App() {
             </div>
           ) : (
             <div className='flex flex-col gap-6'>
-              <div className='w-full h-16 rounded-xl bg-[#272627] flex items-center justify-between text-gray-300'>
-                <div className='flex w-full justify-between container items-center'>
+              <div className='w-full lg:h-16 h-[5rem] rounded-xl bg-[#272627] flex items-center justify-between text-gray-300'>
+                <div className='flex flex-col lg:flex-row w-full justify-between container items-center'>
                   <div className='flex gap-3 items-center'>
-                    <h1>Room Code: <span className='font-bold'>{formData.roomCode}</span></h1>
-                    <button onClick={copyToClipboard}>
+                    <h1 className='text-sm sm:text-md lg:text-lg'>Room Code: <span className='font-bold'>{formData.roomCode}</span></h1>
+                    <button className='' onClick={copyToClipboard}>
                       <i className="ri-file-copy-line text-xl"></i>
                     </button>
                   </div>
 
-                  <div>
-                    Users: {usersList}
-                  </div>
+                  <div className='flex items-center justify-between gap-10'>
+                    <div className='text-sm sm:text-md lg:text-lg'>
+                      Users: {usersList}
+                    </div>
 
-                  <div
-                    onClick={handleLeaveRoom}
-                    className='hover:bg-gray-700 rounded-full py-1 px-2 transition-all duration-300 ease-out cursor-pointer'>
-                    <i className="ri-door-closed-line text-3xl"></i>
+                    <div
+                      className='flex items-center gap-2 text-sm sm:text-md lg:text-lg'>
+                      <span>Exit: </span>
+                      <i
+                        onClick={handleLeaveRoom}
+                        className="ri-door-closed-line md:text-3xl text-2xl hover:bg-gray-700 py-1 px-2 rounded-full transition-all duration-300 ease-out cursor-pointer"></i>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -229,7 +239,7 @@ function App() {
 
                 <button
                   onClick={handleSendMessage}
-                  className='w-[20%] bg-white text-black font-bold rounded-lg'>
+                  className='lg:w-[20%] w-[30%] bg-white text-black font-bold rounded-lg'>
                   Send
                 </button>
               </div>
