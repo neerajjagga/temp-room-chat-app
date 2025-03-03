@@ -8,10 +8,11 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
 app.use(cors({
-    origin: "https://temp-room-chat-app.vercel.app/",
+    origin: ["https://temp-room-chat-app.vercel.app", "http://localhost:3000"],
     credentials: true,
-}))
+}));
 
 const server = createServer(app);
 
