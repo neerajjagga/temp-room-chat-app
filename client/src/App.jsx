@@ -63,12 +63,15 @@ function App() {
 
   const handleCreateNewRoom = () => {
     const roomCode = nanoid(8);
-    setRoomCode(roomCode);
+    socket.emit("createRoom", { roomId: roomCode }, () => {
+      setRoomCode(roomCode);
+      toast.success("Room created successfully");
+    });
   }
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(roomCode);
+      await navigator.clipboard.writeText(formData.roomCode || roomCode);
       toast.success("Room code copied to clipboard!");
     } catch (error) {
       console.error("Error copying text: ", err);
@@ -80,8 +83,13 @@ function App() {
     console.log("Inside handleSubmit");
     setJoiningRoom(true);
     e.preventDefault();
-    socket.emit("joinRoom", { name: formData.name, roomId: formData.roomCode }, () => {
+    socket.emit("joinRoom", { name: formData.name, roomId: formData.roomCode }, ({ status, message }) => {
       setJoiningRoom(false);
+      if(!status) {
+        toast.error(message);
+      } else {
+        toast.success("Room joined successfully");
+      }
     });
   }
 
@@ -94,8 +102,8 @@ function App() {
   const handleLeaveRoom = () => {
     console.log(formData);
     console.log(roomCode);
-    
-    socket.emit("leaveRoom", { name: formData.name, roomId: roomCode }, () => {
+
+    socket.emit("leaveRoom", { name: formData.name, roomId: formData.roomCode }, () => {
       setIsRoomJoined(false);
       setJoiningRoom(false);
       setRoomCode('');
@@ -181,7 +189,7 @@ function App() {
               <div className='w-full h-16 rounded-xl bg-[#272627] flex items-center justify-between text-gray-300'>
                 <div className='flex w-full justify-between container items-center'>
                   <div className='flex gap-3 items-center'>
-                    <h1>Room Code: <span className='font-bold'>{roomCode}</span></h1>
+                    <h1>Room Code: <span className='font-bold'>{formData.roomCode}</span></h1>
                     <button onClick={copyToClipboard}>
                       <i className="ri-file-copy-line text-xl"></i>
                     </button>
@@ -199,7 +207,7 @@ function App() {
                 </div>
               </div>
 
-              <div className='w-full h-80 bg-black border border-gray-800 rounded-xl overflow-y-auto px-6 py-4 flex flex-col gap-4 chat-container'>
+              <div className='w-full h-80 bg-black border border-gray-800 rounded-xl overflow-y-auto px-6 py-4 flex flex-col gap-4 chat-container no-scrollbar'>
                 {messages.length > 0 && (
                   messages.map((chat, index) => {
                     return <div key={index} className={`h-auto text-black flex flex-col gap-1 ${chat.name === formData.name ? "items-end" : "items-start"}`}>
