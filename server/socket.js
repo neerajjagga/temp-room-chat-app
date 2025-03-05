@@ -11,8 +11,6 @@ export const initializeSocket = async (server) => {
     });
 
     io.on("connection", (socket) => {
-        console.log("User connected to websocket server");
-
         socket.on("createRoom", async ({ roomId }, callback) => {
             await Redis.rpush(`room:${roomId}`, "__placeholder__");
             if (typeof callback === "function") {
@@ -43,19 +41,12 @@ export const initializeSocket = async (server) => {
         });
 
         socket.on("sendMessage", ({ fromName, message, roomId }) => {
-            console.log("Inside sendMessage");
-            console.log(fromName + " " + message + " " + roomId);
             io.to(roomId).emit("messageReceived", { fromName, message });
         });
 
         socket.on("leaveRoom", async ({ name, roomId }, callback) => {
-            console.log("Inside leaveRoom");
-            console.log(name + roomId);
-
             await Redis.lrem(`room:${roomId}`, 1, name);
-            console.log(`User disconnected with ${socket.id}`);
             const usersInRoom = await Redis.lrange(`room:${roomId}`, 0, -1);
-            console.log(usersInRoom);
             io.to(roomId).emit("updateUsersList", { users: usersInRoom });
             socket.leave(roomId);
 
@@ -65,8 +56,6 @@ export const initializeSocket = async (server) => {
         });
 
         socket.on("disconnect", async () => {
-            console.log(`User disconnected: ${socket.id}`);
-
             const userData = userSocketMap.get(socket.id);
             if (userData) {
                 const { name, roomId } = userData;

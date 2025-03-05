@@ -25,7 +25,6 @@ function App() {
       setSocket(socket);
 
       socket.on("messageReceived", ({ fromName, message }) => {
-        console.log("Inside useEffect message received");
         setMessages((prevMessages) => [...prevMessages, { name: fromName, message }]);
       });
 
@@ -35,8 +34,6 @@ function App() {
       });
 
       socket.on("updateUsersList", ({ users }) => {
-        console.log(users);
-        console.log("Inside updateUsersList");
         setUsersList(users.length);
       });
     }
@@ -83,7 +80,6 @@ function App() {
   }
 
   const handleSubmit = async (e) => {
-    console.log("Inside handleSubmit");
     setJoiningRoom(true);
     e.preventDefault();
     socket.emit("joinRoom", { name: formData.name, roomId: formData.roomCode }, ({ status, message }) => {
@@ -103,9 +99,6 @@ function App() {
   }
 
   const handleLeaveRoom = () => {
-    console.log(formData);
-    console.log(roomCode);
-
     socket.emit("leaveRoom", { name: formData.name, roomId: formData.roomCode }, () => {
       setIsRoomJoined(false);
       setJoiningRoom(false);
@@ -166,7 +159,7 @@ function App() {
 
                     <button
                       disabled={joiningRoom}
-                      className={`md:w-[40%] lg:text-xl text-sm mt-2 w-full ${joiningRoom ? "bg-gray-300" : "bg-[#fafafa]"} text-black py-2 font-bold rounded-lg flex gap-2 items-center justify-center`} type='submit'>
+                      className={`md:w-[40%] lg:text-xl text-sm mt-2 md:mt-0 w-full ${joiningRoom ? "bg-gray-300" : "bg-[#fafafa]"} text-black py-2 font-bold rounded-lg flex gap-2 items-center justify-center`} type='submit'>
                       Join Room
                       {joiningRoom && (<i className="ri-loader-2-line text-xl animate-spin"></i>)}
                     </button>
