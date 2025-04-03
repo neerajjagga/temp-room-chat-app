@@ -69,9 +69,9 @@ function App() {
     });
   }
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (code) => {
     try {
-      await navigator.clipboard.writeText(formData.roomCode || roomCode);
+      await navigator.clipboard.writeText(code);
       toast.success("Room code copied to clipboard!");
     } catch (error) {
       console.error("Error copying text: ", err);
@@ -113,13 +113,13 @@ function App() {
   return (
     <>
       <div className='h-screen bg-[#0b0b0a] flex justify-center items-center  font-JetBrains text-white'>
-        <div className='xl:w-[42%] lg:w-[60%] w-[95%] container border border-gray-800 py-5 rounded-2xl flex flex-col gap-6'>
+        <div className='xl:w-[42%] lg:w-[60%] w-[95%] container border border-gray-800 py-3 rounded-2xl flex flex-col gap-6'>
           <div className='flex flex-col gap-1'>
             <div className='flex gap-2 items-center'>
-              <i className="ri-chat-3-line text-3xl"></i>
-              <h1 className='font-medium md:text-3xl text-2xl'>Real Time Chat</h1>
+              <i className="ri-chat-3-line lg:text-3xl text-2xl"></i>
+              <h1 className='font-medium lg:text-3xl text-xl'>Real Time Chat</h1>
             </div>
-            <p className='text-sm text-gray-400'>temporary room that expires after all users exit
+            <p className='lg:text-sm text-xs text-gray-400'>temporary room that expires after all users exit
             </p>
           </div>
 
@@ -176,7 +176,7 @@ function App() {
 
                   <div className='flex gap-6 items-center'>
                     <span className='lg:text-2xl text-xl font-bold'>{roomCode}</span>
-                    <button onClick={copyToClipboard}>
+                    <button onClick={() => copyToClipboard(roomCode)}>
                       <i className="ri-file-copy-line lg:text-2xl text-xl"></i>
                     </button>
                   </div>
@@ -184,12 +184,12 @@ function App() {
               )}
             </div>
           ) : (
-            <div className='flex flex-col gap-6'>
+            <div className='flex flex-col gap-4'>
               <div className='w-full lg:h-16 h-[5rem] rounded-xl bg-[#272627] flex items-center justify-between text-gray-300'>
                 <div className='flex flex-col lg:flex-row w-full justify-between container items-center'>
                   <div className='flex gap-3 items-center'>
                     <h1 className='text-sm sm:text-md lg:text-lg'>Room Code: <span className='font-bold'>{formData.roomCode}</span></h1>
-                    <button className='' onClick={copyToClipboard}>
+                    <button className='' onClick={() => copyToClipboard(formData.roomCode)}>
                       <i className="ri-file-copy-line text-xl"></i>
                     </button>
                   </div>
@@ -210,7 +210,7 @@ function App() {
                 </div>
               </div>
 
-              <div className='w-full h-80 bg-black border border-gray-800 rounded-xl overflow-y-auto px-6 py-4 flex flex-col gap-4 chat-container no-scrollbar'>
+              <div className='w-full h-[22rem] bg-black border border-gray-800 rounded-xl overflow-y-auto px-6 py-4 flex flex-col gap-4 chat-container no-scrollbar'>
                 {messages.length > 0 && (
                   messages.map((chat, index) => {
                     return <div key={index} className={`h-auto text-black flex flex-col gap-1 ${chat.name === formData.name ? "items-end" : "items-start"}`}>
